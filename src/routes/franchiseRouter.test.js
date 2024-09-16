@@ -54,6 +54,24 @@ describe('franchiseRouter', () => {
         expect(deleteFranchiseRes.status).toBe(200);
         expect(deleteFranchiseRes.body.message).toBe('franchise deleted');
     });
+
+    test('createStore', async () => {
+        const store = { franchiseId: franchiseId, name: randomName() };
+        const createStoreRes = await request(app).post('/api/franchise/' + franchiseId + '/store').set('Authorization', 'Bearer ' + adminUserAuthToken).send(store);
+        expect(createStoreRes.status).toBe(200);
+        expect(createStoreRes.body).toMatchObject(store);
+
+        await DB.deleteStore(franchiseId, createStoreRes.body.id);
+    });
+
+    test('deleteStore', async () => {
+        const store = { franchiseId: franchiseId, name: randomName() };
+        const storeRes = await DB.createStore(franchiseId, store);
+
+        const deleteStoreRes = await request(app).delete('/api/franchise/' + franchiseId + '/store/' + storeRes.id).set('Authorization', 'Bearer ' + adminUserAuthToken);
+        expect(deleteStoreRes.status).toBe(200);
+        expect(deleteStoreRes.body.message).toBe('store deleted');
+    });
 });
 
 async function createAdminUser() {
