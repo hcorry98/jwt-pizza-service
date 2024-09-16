@@ -46,6 +46,22 @@ describe('franchiseRouter', () => {
         await DB.deleteFranchise(createFranchiseRes.body.id);
     });
 
+    test('createFranchise non-admin', async () => {
+        let nonAdminUser = { name: randomName(), email: randomName() + '@test.com', password: 'a', roles: [{role: Role.Diner}] };
+        nonAdminUser = await DB.addUser(nonAdminUser);
+        nonAdminUser.password = 'a';
+
+        const loginRes = await request(app).put('/api/auth').send(nonAdminUser);
+        const token = loginRes.body.token;
+
+        const franchise = { name: randomName(), admins: [{ email: nonAdminUser.email }] };
+        const createFranchiseRes = await request(app).post('/api/franchise').set('Authorization', 'Bearer ' + token).send(franchise);
+        expect(createFranchiseRes.status).toBe(403);
+        expect(createFranchiseRes.body.message).toBe('unable to create a franchise');
+
+        await DB.deleteUser(nonAdminUser.id);
+    });
+
     test('deleteFranchise', async () => {
         const franchise = { name: randomName(), admins: [{ email: adminUser.email }] };
         const franchiseRes = await DB.createFranchise(franchise);
@@ -53,6 +69,25 @@ describe('franchiseRouter', () => {
         const deleteFranchiseRes = await request(app).delete('/api/franchise/' + franchiseRes.id).set('Authorization', 'Bearer ' + adminUserAuthToken);
         expect(deleteFranchiseRes.status).toBe(200);
         expect(deleteFranchiseRes.body.message).toBe('franchise deleted');
+    });
+
+    test('deleteFranchise non-admin', async () => {
+        let nonAdminUser = { name: randomName(), email: randomName() + '@test.com', password: 'a', roles: [{role: Role.Diner}] };
+        nonAdminUser = await DB.addUser(nonAdminUser);
+        nonAdminUser.password = 'a';
+
+        const loginRes = await request(app).put('/api/auth').send(nonAdminUser);
+        const token = loginRes.body.token;
+
+        const franchise = { name: randomName(), admins: [{ email: nonAdminUser.email }] };
+        const franchiseRes = await DB.createFranchise(franchise);
+
+        const deleteFranchiseRes = await request(app).delete('/api/franchise/' + franchiseRes.id).set('Authorization', 'Bearer ' + token);
+        expect(deleteFranchiseRes.status).toBe(403);
+        expect(deleteFranchiseRes.body.message).toBe('unable to delete a franchise');
+
+        await DB.deleteFranchise(franchiseRes.id);
+        await DB.deleteUser(nonAdminUser.id);
     });
 
     test('createStore', async () => {
