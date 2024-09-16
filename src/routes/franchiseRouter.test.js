@@ -36,6 +36,24 @@ describe('franchiseRouter', () => {
         const franchiseRes = getUserFranchisesRes.body;
         expect(franchiseRes).toEqual(expect.arrayContaining([expect.objectContaining({ id: franchiseId })]));
     });
+
+    test('createFranchise', async () => {
+        const franchise = { name: randomName(), admins: [{ email: adminUser.email }] };
+        const createFranchiseRes = await request(app).post('/api/franchise').set('Authorization', 'Bearer ' + adminUserAuthToken).send(franchise);
+        expect(createFranchiseRes.status).toBe(200);
+        expect(createFranchiseRes.body).toMatchObject(franchise);
+
+        await DB.deleteFranchise(createFranchiseRes.body.id);
+    });
+
+    test('deleteFranchise', async () => {
+        const franchise = { name: randomName(), admins: [{ email: adminUser.email }] };
+        const franchiseRes = await DB.createFranchise(franchise);
+
+        const deleteFranchiseRes = await request(app).delete('/api/franchise/' + franchiseRes.id).set('Authorization', 'Bearer ' + adminUserAuthToken);
+        expect(deleteFranchiseRes.status).toBe(200);
+        expect(deleteFranchiseRes.body.message).toBe('franchise deleted');
+    });
 });
 
 async function createAdminUser() {
