@@ -23,8 +23,18 @@ describe('franchiseRouter', () => {
         await DB.deleteFranchise(franchiseId);
     });
 
-    test('Hello World', async () => {
-        console.log('Hello World');
+    test('getFranchises', async () => {
+        const getFranchisesRes = await request(app).get('/api/franchise').set('Authorization', 'Bearer ' + adminUserAuthToken);
+        expect(getFranchisesRes.status).toBe(200);
+        const franchiseRes = getFranchisesRes.body;
+        expect(franchiseRes).toEqual(expect.arrayContaining([expect.objectContaining({ id: franchiseId })]));
+    });
+
+    test('getUserFranchises', async () => {
+        const getUserFranchisesRes = await request(app).get('/api/franchise/' + adminUser.id).set('Authorization', 'Bearer ' + adminUserAuthToken);
+        expect(getUserFranchisesRes.status).toBe(200);
+        const franchiseRes = getUserFranchisesRes.body;
+        expect(franchiseRes).toEqual(expect.arrayContaining([expect.objectContaining({ id: franchiseId })]));
     });
 });
 
