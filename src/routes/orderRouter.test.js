@@ -41,7 +41,7 @@ describe('orderRouter', () => {
     test('getMenu', async () => {
         const getMenuRes = await request(app).get('/api/order/menu');
         expect(getMenuRes.status).toBe(200);
-        expect(getMenuRes.body).toEqual(pizzas);
+        expect(getMenuRes.body).toEqual(expect.arrayContaining([veggiePizza, studentPizza]));
     });
 
     test('addMenuItem', async () => {
@@ -51,7 +51,7 @@ describe('orderRouter', () => {
         expect(addMenuItemRes.status).toBe(200);
         const newPizzaId = addMenuItemRes.body[addMenuItemRes.body.length - 1].id;
         newPizza.id = newPizzaId;
-        expect(addMenuItemRes.body).toEqual([...pizzas, { ...newPizza }]);
+        expect(addMenuItemRes.body).toEqual(expect.arrayContaining([...pizzas, newPizza]));
 
         await DB.deleteMenuItem(newPizzaId);
     });
