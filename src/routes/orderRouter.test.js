@@ -22,7 +22,7 @@ describe('orderRouter', () => {
         let setupRes;
         for (const pizza of pizzas) {
             setupRes = await request(app).put('/api/order/menu').set('Authorization', 'Bearer ' + adminUserAuthToken).send(pizza);
-            ids = setupRes.body;
+            const ids = setupRes.body;
             pizzaIds.push(ids[ids.length - 1].id);
             pizza.id = ids[ids.length - 1].id;
         }
