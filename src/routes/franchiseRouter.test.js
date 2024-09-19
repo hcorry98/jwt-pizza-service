@@ -37,6 +37,21 @@ describe('franchiseRouter', () => {
         expect(franchiseRes).toEqual(expect.arrayContaining([expect.objectContaining({ id: franchiseId })]));
     });
 
+    test('getUserFranchises non-admin other user', async () => {
+        let nonAdminUser = { name: randomName(), email: randomName() + '@test.com', password: 'a', roles: [{role: Role.Diner}] };
+        nonAdminUser = await DB.addUser(nonAdminUser);
+        nonAdminUser.password = 'a';
+
+        const loginRes = await request(app).put('/api/auth').send(nonAdminUser);
+        const token = loginRes.body.token;
+
+        const getUserFranchisesRes = await request(app).get('/api/franchise/' + adminUser.id).set('Authorization', 'Bearer ' + token);
+        expect(getUserFranchisesRes.status).toBe(200);
+        expect(getUserFranchisesRes.body).toEqual([]);
+
+        await DB.deleteUser(nonAdminUser.id);
+    });
+
     test('createFranchise', async () => {
         const franchise = { name: randomName(), admins: [{ email: adminUser.email }] };
         const createFranchiseRes = await request(app).post('/api/franchise').set('Authorization', 'Bearer ' + adminUserAuthToken).send(franchise);
@@ -99,6 +114,22 @@ describe('franchiseRouter', () => {
         await DB.deleteStore(franchiseId, createStoreRes.body.id);
     });
 
+    test('createStore non-admin', async () => {
+        let nonAdminUser = { name: randomName(), email: randomName() + '@test.com', password: 'a', roles: [{role: Role.Diner}] };
+        nonAdminUser = await DB.addUser(nonAdminUser);
+        nonAdminUser.password = 'a';
+
+        const loginRes = await request(app).put('/api/auth').send(nonAdminUser);
+        const token = loginRes.body.token;
+
+        const store = { franchiseId: franchiseId, name: randomName() };
+        const createStoreRes = await request(app).post('/api/franchise/' + franchiseId + '/store').set('Authorization', 'Bearer ' + token).send(store);
+        expect(createStoreRes.status).toBe(403);
+        expect(createStoreRes.body.message).toBe('unable to create a store');
+
+        await DB.deleteUser(nonAdminUser.id);
+    });
+
     test('deleteStore', async () => {
         const store = { franchiseId: franchiseId, name: randomName() };
         const storeRes = await DB.createStore(franchiseId, store);
@@ -106,6 +137,25 @@ describe('franchiseRouter', () => {
         const deleteStoreRes = await request(app).delete('/api/franchise/' + franchiseId + '/store/' + storeRes.id).set('Authorization', 'Bearer ' + adminUserAuthToken);
         expect(deleteStoreRes.status).toBe(200);
         expect(deleteStoreRes.body.message).toBe('store deleted');
+    });
+
+    test('deleteStore non-admin', async () => {
+        let nonAdminUser = { name: randomName(), email: randomName() + '@test.com', password: 'a', roles: [{role: Role.Diner}] };
+        nonAdminUser = await DB.addUser(nonAdminUser);
+        nonAdminUser.password = 'a';
+
+        const loginRes = await request(app).put('/api/auth').send(nonAdminUser);
+        const token = loginRes.body.token;
+
+        const store = { franchiseId: franchiseId, name: randomName() };
+        const storeRes = await DB.createStore(franchiseId, store);
+
+        const deleteStoreRes = await request(app).delete('/api/franchise/' + franchiseId + '/store/' + storeRes.id).set('Authorization', 'Bearer ' + token);
+        expect(deleteStoreRes.status).toBe(403);
+        expect(deleteStoreRes.body.message).toBe('unable to delete a store');
+
+        await DB.deleteStore(franchiseId, storeRes.id);
+        await DB.deleteUser(nonAdminUser.id);
     });
 });
 
