@@ -12,7 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.set_version.outputs.version }}
-
     services:
       mysql:
         image: mysql:8.0.29
@@ -27,7 +26,6 @@ jobs:
           --health-start-period 10s
           --health-timeout 5s
           --health-retries 10
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -66,7 +64,7 @@ jobs:
       - name: Tests
         run: npm test
 
-      - name: set version
+      - name: Set version
         id: set_version
         run: |
           version=$(date +'%Y%m%d.%H%M%S')
