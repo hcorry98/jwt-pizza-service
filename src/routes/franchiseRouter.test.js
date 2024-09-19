@@ -30,6 +30,20 @@ describe('franchiseRouter', () => {
         expect(franchiseRes).toEqual(expect.arrayContaining([expect.objectContaining({ id: franchiseId })]));
     });
 
+    test('getFranchises non-admin', async () => {
+        let nonAdminUser = { name: randomName(), email: randomName() + '@test.com', password: 'a', roles: [{role: Role.Diner}] };
+        nonAdminUser = await DB.addUser(nonAdminUser);
+        nonAdminUser.password = 'a';
+
+        const loginRes = await request(app).put('/api/auth').send(nonAdminUser);
+        const token = loginRes.body.token;
+
+        const getFranchisesRes = await request(app).get('/api/franchise').set('Authorization', 'Bearer ' + token);
+        expect(getFranchisesRes.status).toBe(200);
+
+        await DB.deleteUser(nonAdminUser.id);
+    });
+
     test('getUserFranchises', async () => {
         const getUserFranchisesRes = await request(app).get('/api/franchise/' + adminUser.id).set('Authorization', 'Bearer ' + adminUserAuthToken);
         expect(getUserFranchisesRes.status).toBe(200);
@@ -50,6 +64,12 @@ describe('franchiseRouter', () => {
         expect(getUserFranchisesRes.body).toEqual([]);
 
         await DB.deleteUser(nonAdminUser.id);
+    });
+
+    test('getUserFranchises no franchises', async () => {
+        const getUserFranchisesRes = await request(app).get('/api/franchise/0').set('Authorization', 'Bearer ' + adminUserAuthToken);
+        expect(getUserFranchisesRes.status).toBe(200);
+        expect(getUserFranchisesRes.body).toEqual([]);
     });
 
     test('createFranchise', async () => {
@@ -75,6 +95,14 @@ describe('franchiseRouter', () => {
         expect(createFranchiseRes.body.message).toBe('unable to create a franchise');
 
         await DB.deleteUser(nonAdminUser.id);
+    });
+
+    test('createFranchise no user', async () => {
+        const nonExistingEmail = 'incorrect@email.com'
+        const franchise = { name: randomName(), admins: [{ email: nonExistingEmail }] };
+        const createFranchiseRes = await request(app).post('/api/franchise').set('Authorization', 'Bearer ' + adminUserAuthToken).send(franchise);
+        expect(createFranchiseRes.status).toBe(404);
+        expect(createFranchiseRes.body.message).toBe('unknown user for franchise admin ' + nonExistingEmail + ' provided');
     });
 
     test('deleteFranchise', async () => {
