@@ -41,7 +41,7 @@ class Metrics {
   }
 
   sendMetricsPeriodically(period) {
-    setInterval(() => {
+    const timer = setInterval(() => {
       try {
         const buf = new MetricBuilder();
         this.httpMetrics.getMetrics(buf);
@@ -56,6 +56,7 @@ class Metrics {
         console.log('Error sending metrics', error);
       }
     }, period);
+    timer.unref();
   }
 
   sendMetricToGrafana(metrics) {
@@ -87,7 +88,7 @@ class Metric {
 
 class AnyMetrics {
   constructor() {
-    this.metrics;
+    this.metrics = {};
   }
 
   getMetrics(builder) {
@@ -133,6 +134,7 @@ class SystemMetrics extends AnyMetrics {
     super();
     this.cpuUsage = 0;
     this.memoryUsage = 0;
+    this.setMetrics(1000);
   }
 
   getCpuUsagePercentage() {
@@ -149,7 +151,7 @@ class SystemMetrics extends AnyMetrics {
   }
 
   setMetrics(period) {
-    setInterval(() => {
+    const timer = setInterval(() => {
       this.cpuUsage = this.getCpuUsagePercentage();
       this.memoryUsage = this.getMemoryUsagePercentage();
       this.metrics = {
@@ -157,6 +159,7 @@ class SystemMetrics extends AnyMetrics {
         memory: new Metric('system', {type: 'memory'}, {usage: this.memoryUsage}),
       };
     }, period);
+    timer.unref();
   }
 }
 

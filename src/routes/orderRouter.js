@@ -42,7 +42,7 @@ orderRouter.endpoints = [
 ];
 
 // Track purchases
-orderRouter.track = metrics.purchaseMetrics.purchaseTracker;
+orderRouter.trackPurchases = (req, res, next) => metrics.purchaseMetrics.purchaseTracker(req, res, next);
 
 // getMenu
 orderRouter.get(

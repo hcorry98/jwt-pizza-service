@@ -67,7 +67,7 @@ authRouter.authenticateToken = (req, res, next) => {
 };
 
 // Track users
-authRouter.track = metrics.userMetrics.usersTracker;
+authRouter.trackUsers = (req, res, next) => metrics.userMetrics.usersTracker(req, res, next);
 
 // register
 authRouter.post(

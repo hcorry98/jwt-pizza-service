@@ -16,7 +16,7 @@ app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   next();
 });
-app.use(metrics.httpMetrics.requestTracker);
+app.use((req, res, next) => metrics.httpMetrics.requestTracker(req, res, next));
 
 const apiRouter = express.Router();
 app.use('/api', apiRouter);
