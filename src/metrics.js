@@ -154,8 +154,8 @@ class SystemMetrics extends AnyMetrics {
       this.cpuUsage = this.getCpuUsagePercentage();
       this.memoryUsage = this.getMemoryUsagePercentage();
       this.metrics = {
-        cpu: new Metric('system', {type: 'cpu'}, {usage: this.cpuUsage}),
-        memory: new Metric('system', {type: 'memory'}, {usage: this.memoryUsage}),
+        cpu: new Metric('system', {type: 'CPU'}, {usage: this.cpuUsage}),
+        memory: new Metric('system', {type: 'Memory'}, {usage: this.memoryUsage}),
       };
     }, period);
     timer.unref();
@@ -206,26 +206,26 @@ class PurchaseMetrics extends AnyMetrics {
     const order = req.body;
 
     this.totalPurchases += order.items.length;
-    this.metrics.purchases = new Metric('pizzas', {type: 'purchases'}, {total: this.totalPurchases});
+    this.metrics.purchases = new Metric('sales', {type: 'Purchases'}, {total: this.totalPurchases});
 
     let totalCost = 0;
     for (let item of order.items) {
       totalCost += item.price;
     }
     this.totalRevenue += totalCost;
-    this.metrics.revenue = new Metric('pizzas', {type: 'revenue'}, {total: this.totalRevenue});
+    this.metrics.revenue = new Metric('sales', {type: 'Revenue'}, {total: this.totalRevenue});
 
     next();
   }
 
   updateLatencyMetric(latency) {
     this.currentCreationLatency = latency;
-    this.metrics.latency = new Metric('pizzas', {type: 'creation_latency'}, {current: this.currentCreationLatency});
+    this.metrics.latency = new Metric('creation', {type: 'Latency'}, {current: this.currentCreationLatency});
   }
 
   incrementFailures() {
     this.totalCreationFailures++;
-    this.metrics.failures = new Metric('pizzas', {type: 'creation_failures'}, {total: this.totalCreationFailures});
+    this.metrics.failures = new Metric('creation', {type: 'Failures'}, {total: this.totalCreationFailures});
   }
 }
 
@@ -238,12 +238,12 @@ class AuthMetrics extends AnyMetrics {
 
   incrementSuccesses() {
     this.totalSuccesses++;
-    this.metrics.success = new Metric('auth', {result: 'successful'}, {total: this.totalSuccesses});
+    this.metrics.success = new Metric('auth', {result: 'Successful'}, {total: this.totalSuccesses});
   }
 
   incrementFailures() {
     this.totalFailures++;
-    this.metrics.fail = new Metric('auth', {result: 'failed'}, {total: this.totalFailures});
+    this.metrics.fail = new Metric('auth', {result: 'Failed'}, {total: this.totalFailures});
   }
 }
 
