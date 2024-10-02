@@ -90,7 +90,8 @@ class AnyMetrics {
   }
 
   getMetrics(builder) {
-    for (let metric in this.metrics) {
+    for (let metricName in this.metrics) {
+      const metric = this.metrics[metricName];
       builder.append(metric.prefix, metric.tags, metric.metrics);
     }
   }
