@@ -56,16 +56,11 @@ async function setAuthUser(req, res, next) {
   next();
 }
 
-// Track users
-authRouter.use((req, res, next) => metrics.userMetrics.usersTracker(req, res, next));
-
 // Authenticate token
 authRouter.authenticateToken = (req, res, next) => {
   if (!req.user) {
-    metrics.authMetrics.incrementFailures();
     return res.status(401).send({ message: 'unauthorized' });
   }
-  metrics.authMetrics.incrementSuccesses();
   next();
 };
 
@@ -78,6 +73,7 @@ authRouter.post(
       return res.status(400).json({ message: 'name, email, and password are required' });
     }
     const user = await DB.addUser({ name, email, password, roles: [{ role: Role.Diner }] });
+    metrics.userMetrics.incrementActiveUsers();
     const auth = await setAuth(user);
     res.json({ user: user, token: auth });
   })
@@ -89,6 +85,8 @@ authRouter.put(
   asyncHandler(async (req, res) => {
     const { email, password } = req.body;
     const user = await DB.getUser(email, password);
+    metrics.userMetrics.incrementActiveUsers();
+    metrics.authMetrics.incrementSuccesses();
     const auth = await setAuth(user);
     res.json({ user: user, token: auth });
   })
@@ -100,6 +98,7 @@ authRouter.delete(
   authRouter.authenticateToken,
   asyncHandler(async (req, res) => {
     clearAuth(req);
+    metrics.userMetrics.decrementActiveUsers();
     res.json({ message: 'logout successful' });
   })
 );

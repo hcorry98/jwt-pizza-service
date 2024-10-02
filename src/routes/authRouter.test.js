@@ -29,6 +29,13 @@ describe('authRouter', () => {
         expect(password).toBe(testUser.password);
     });
 
+    test('login incorrect password', async () => {
+        testUser.password = 'wrongpassword';
+        const loginRes = await request(app).put('/api/auth').send(testUser);
+        expect(loginRes.status).toBe(404);
+        expect(loginRes.body.message).toBe('unknown user');
+    });
+
     test('logout', async () => {
         const logoutRes = await request(app).delete('/api/auth').set('Authorization', 'Bearer ' + testUserAuthToken);
         expect(logoutRes.status).toBe(200);
