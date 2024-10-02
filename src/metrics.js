@@ -41,7 +41,7 @@ class Metrics {
   }
 
   sendMetricsPeriodically(period) {
-    const timer = setInterval(() => {
+    setInterval(() => {
       try {
         const buf = new MetricBuilder();
         this.httpMetrics.getMetrics(buf);
@@ -68,7 +68,7 @@ class Metrics {
         if (!response.ok) {
           console.error('Failed to push metrics data to Grafana');
         } else {
-          console.log(`Pushed ${metric}`);
+          console.log(`Pushed ${metrics}`);
         }
       })
       .catch((error) => {
@@ -149,7 +149,7 @@ class SystemMetrics extends AnyMetrics {
   }
 
   setMetrics(period) {
-    const timer = setInterval(() => {
+    setInterval(() => {
       this.cpuUsage = this.getCpuUsagePercentage();
       this.memoryUsage = this.getMemoryUsagePercentage();
       this.metrics = {
