@@ -56,6 +56,9 @@ async function setAuthUser(req, res, next) {
   next();
 }
 
+// Track users
+authRouter.use((req, res, next) => metrics.userMetrics.usersTracker(req, res, next));
+
 // Authenticate token
 authRouter.authenticateToken = (req, res, next) => {
   if (!req.user) {
@@ -65,9 +68,6 @@ authRouter.authenticateToken = (req, res, next) => {
   metrics.authMetrics.incrementSuccesses();
   next();
 };
-
-// Track users
-authRouter.trackUsers = (req, res, next) => metrics.userMetrics.usersTracker(req, res, next);
 
 // register
 authRouter.post(

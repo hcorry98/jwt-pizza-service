@@ -9,10 +9,8 @@ class MetricBuilder {
   append(prefix, tags, metrics) {
     let metric = prefix;
 
-    if (tags) {
-      for (let tag in tags) {
-        metric += `,${tag}=${tags[tag]}`;
-      }
+    for (let tag in tags) {
+      metric += `,${tag}=${tags[tag]}`;
     }
     metric += ' ';
 
@@ -201,6 +199,7 @@ class PurchaseMetrics extends AnyMetrics {
   purchaseTracker(req, res, next) {
     if (req.method !== 'POST') {
       next();
+      return;
     }
 
     const order = req.body;
