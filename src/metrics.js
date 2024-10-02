@@ -177,7 +177,7 @@ class UserMetrics extends AnyMetrics {
   usersTracker(req, res, next) {
     if (req.method === 'POST') {
       this.totalUsers++;
-    } else if (req.method === 'PUT' && !req.params) {
+    } else if (req.method === 'PUT' && Object.keys(req.params).length === 0) {
       this.totalUsers++;
     } else if (req.method === 'DELETE') {
       this.totalUsers--;
