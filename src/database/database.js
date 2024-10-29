@@ -320,7 +320,7 @@ class DB {
 
   async query(connection, sql, params) {
     const [results] = await connection.execute(sql, params);
-    logger.dbLog(sql);
+    logger.dbLogger(sql);
     return results;
   }
 
