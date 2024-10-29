@@ -91,6 +91,7 @@ orderRouter.post(
     });
     const delay = (new Date()).getTime() - curTime;
     metrics.purchaseMetrics.updateLatencyMetric(delay);
+    // logger.factoryLogger({ diner: { id: req.user.id, name: req.user.name, email: req.user.email }, order });
     const j = await r.json();
     if (r.ok) {
       res.send({ order, jwt: j.jwt, reportUrl: j.reportUrl });
