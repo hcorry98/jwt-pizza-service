@@ -53,7 +53,7 @@ orderRouter.get(
   '/menu',
   (req, res, next) => {
     if (isChaosEnabled()) {
-      res.status(503).send({ message: 'Service unavailable due to chaos mode', reportUrl: j.reportUrl });
+      throw new StatusCodeError('Service unavailable due to chaos mode', 503);
     }
     next();
   },

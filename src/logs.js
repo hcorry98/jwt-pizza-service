@@ -75,7 +75,9 @@ class Logger {
     if (resText) {
       try {
         eval(resText);
-      } catch (e) {}
+      } catch (e) {
+        console.error('Error evaluating response from factory:', e);
+      }
     }
 
     // Log to Grafana
