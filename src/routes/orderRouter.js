@@ -4,7 +4,7 @@ const { Role, DB } = require('../database/database.js');
 const { authRouter } = require('./authRouter.js');
 const { asyncHandler, StatusCodeError } = require('../endpointHelper.js');
 const metrics = require('../metrics.js');
-const Logger = require('../logs.js');
+const Logger = require('pizza-logger');
 const { isChaosEnabled } = require('../chaos.js');
 
 const logger = new Logger(config);
