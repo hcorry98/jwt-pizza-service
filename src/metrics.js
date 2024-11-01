@@ -250,6 +250,7 @@ class ChaosMetrics extends AnyMetrics {
   constructor() {
     super();
     this.chaosEnabled = false;
+    this.enableChaos(this.chaosEnabled);
   }
 
   enableChaos(enabled) {
