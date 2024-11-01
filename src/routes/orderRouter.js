@@ -5,6 +5,7 @@ const { authRouter } = require('./authRouter.js');
 const { asyncHandler, StatusCodeError } = require('../endpointHelper.js');
 const metrics = require('../metrics.js');
 const Logger = require('pizza-logger');
+const { isChaosEnabled } = require('../chaos.js');
 
 const logger = new Logger(config);
 
@@ -50,6 +51,12 @@ orderRouter.use((req, res, next) => metrics.purchaseMetrics.purchaseTracker(req,
 // getMenu
 orderRouter.get(
   '/menu',
+  (req, res, next) => {
+    if (isChaosEnabled()) {
+      res.status(503).send({ message: 'Service unavailable due to chaos mode', reportUrl: j.reportUrl });
+    }
+    next();
+  },
   asyncHandler(async (req, res) => {
     res.send(await DB.getMenu());
   })
