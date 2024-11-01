@@ -43,6 +43,14 @@ describe('orderRouterMenu', () => {
         expect(getMenuRes.body).toEqual(expect.arrayContaining([veggiePizza, studentPizza]));
     });
 
+    test('getMenu chaos', async () => {
+        const chaos = await request(app).put('/api/auth/chaos/true').set('Authorization', 'Bearer ' + adminUserAuthToken);
+        const getMenuRes = await request(app).get('/api/order/menu');
+        expect(getMenuRes.status).toBe(503);
+        expect(getMenuRes.body.message).toBe('Service unavailable due to chaos mode');
+        await request(app).put('/api/auth/chaos/false').set('Authorization', 'Bearer ' + adminUserAuthToken);
+    });
+
     test('addMenuItem', async () => {
         const newPizza = { title: 'Meat', description: 'All the meats', image: 'pizza2.png', price: 0.0045 };
         const addMenuItemRes = await request(app).put('/api/order/menu').set('Authorization', 'Bearer ' + adminUserAuthToken).send(newPizza);

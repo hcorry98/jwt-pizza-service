@@ -1,5 +1,3 @@
-const { metrics } = require('./metrics.js');
-
 let chaosEnabled = false;
 
 function isChaosEnabled() {
@@ -8,7 +6,6 @@ function isChaosEnabled() {
 
 function enableChaos(value) {
   chaosEnabled = value;
-  metrics.chaos.enableChaos(value);
 }
 
 module.exports = { isChaosEnabled, enableChaos };
