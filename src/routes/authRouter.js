@@ -133,7 +133,7 @@ authRouter.put(
     const enable = req.params.state === 'true';
     enableChaos(enable);
     metrics.chaosMetrics.enableChaos(enable);
-    res.json({ chaos: enableChaos });
+    res.json({ chaos: enable });
   })
 );
 
