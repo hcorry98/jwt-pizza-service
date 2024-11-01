@@ -44,7 +44,7 @@ describe('orderRouterMenu', () => {
     });
 
     test('getMenu chaos', async () => {
-        const chaos = await request(app).put('/api/auth/chaos/true').set('Authorization', 'Bearer ' + adminUserAuthToken);
+        await request(app).put('/api/auth/chaos/true').set('Authorization', 'Bearer ' + adminUserAuthToken);
         const getMenuRes = await request(app).get('/api/order/menu');
         expect(getMenuRes.status).toBe(503);
         expect(getMenuRes.body.message).toBe('Service unavailable due to chaos mode');
