@@ -5,7 +5,7 @@ const franchiseRouter = require('./routes/franchiseRouter.js');
 const version = require('./version.json');
 const config = require('./config.js');
 const metrics = require('./metrics.js');
-const Logger = require('pizza-logger');
+const Logger = require('./logs.js');
 
 const logger = new Logger(config);
 
