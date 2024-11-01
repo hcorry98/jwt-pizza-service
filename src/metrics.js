@@ -34,6 +34,7 @@ class Metrics {
     this.userMetrics = new UserMetrics();
     this.purchaseMetrics = new PurchaseMetrics();
     this.authMetrics = new AuthMetrics();
+    this.chaosMetrics = new ChaosMetrics();
 
     this.sendMetricsPeriodically(10000);
   }
@@ -47,6 +48,7 @@ class Metrics {
         this.userMetrics.getMetrics(buf);
         this.purchaseMetrics.getMetrics(buf);
         this.authMetrics.getMetrics(buf);
+        this.chaosMetrics.getMetrics(buf);
   
         const metrics = buf.toString('\n');
         this.sendMetricToGrafana(metrics);
@@ -241,6 +243,18 @@ class AuthMetrics extends AnyMetrics {
   incrementFailures() {
     this.totalFailures++;
     this.metrics.fail = new Metric('auth', {result: 'Failed'}, {total: this.totalFailures});
+  }
+}
+
+class ChaosMetrics extends AnyMetrics {
+  constructor() {
+    super();
+    this.chaosEnabled = false;
+  }
+
+  enableChaos(enabled) {
+    this.chaosEnabled = enabled;
+    this.metrics.chaos = new Metric('chaos', null, {enabled: this.chaosEnabled ? 1 : 0});
   }
 }
 
